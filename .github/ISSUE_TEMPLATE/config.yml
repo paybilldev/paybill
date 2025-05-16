@@ -1,0 +1,13 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discord Chat Support
+    url: https://discord.gg/v9rYchap
+    about: Realtime support & chat with the Paybill community and the team.
+
+  - name: Debugging & Common Issues
+    url: https://docs.paybill.dev/debugging/
+    about: Find details on how to debug issues and view common issues with their resolutions.
+
+  - name: Official Support Plans
+    url: https://paybill.dev/support/
+    about: View our official support plans that offer assured support for business.
