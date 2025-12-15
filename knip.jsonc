@@ -1,0 +1,10 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
+  "exclude": ["types", "exports"],
+  "ignore": [
+    "examples/**",
+    "**/*.test.ts",
+    // ignore studio public folder
+    "apps/studio/public/**",
+  ],
+}

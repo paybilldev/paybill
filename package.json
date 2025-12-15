@@ -1,0 +1,48 @@
+{
+  "name": "paybill",
+  "description": "The Database Development Platform.",
+  "version": "0.0.0",
+  "author": "Paybill KE Limited.",
+  "license": "",
+  "private": true,
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "build": "turbo run build",
+    "build:studio": "turbo run build --filter=studio",
+    "build:studio:docker": "bash scripts/build-studio.sh",
+    "clean": "turbo run clean --parallel && rimraf -G node_modules/{*,.bin,.modules.yaml}",
+    "dev": "turbo run dev --parallel",
+    "dev:studio": "turbo run dev --filter=studio --parallel",
+    "lint": "turbo run lint",
+    "typecheck": "turbo --continue typecheck",
+    "test:prettier": "prettier --cache --check '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "format": "prettier --cache --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "test:studio": "turbo run test --filter=studio",
+    "test:studio:watch": "turbo run test --filter=studio -- watch",
+    "e2e": "pnpm --prefix e2e/studio run e2e",
+    "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
+    "studio:codegen": "cd packages/api-types && pnpm run codegen",
+    "knip": "pnpx knip@~5.50.0"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.410.0",
+    "@types/node": "catalog:",
+    "eslint": "^9.0.0",
+    "prettier": "3.2.4",
+    "rimraf": "^6.0.0",
+    "sass": "^1.72.0",
+    "supports-color": "^8.0.0",
+    "turbo": "2.3.3",
+    "typescript": "catalog:"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paybilldev/paybill.git"
+  },
+  "engines": {
+    "pnpm": "10.18",
+    "node": ">=22"
+  },
+  "keywords": ["storage", "functions", "database", "auth"],
+  "packageManager": "pnpm@10.18.0"
+}
