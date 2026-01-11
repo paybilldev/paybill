@@ -17,6 +17,7 @@ catalog:
   vite: ^7.1.11
   vitest: ^3.2.0
   zod: ^3.25.76
+  unbuild: 3.6.1
 
 minimumReleaseAgeExclude:
   - '@paybilldev/*'
