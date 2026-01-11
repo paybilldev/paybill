@@ -1,0 +1,34 @@
+{
+  "name": "@paybilldev/tsconfig",
+  "description": "Base tsconfig for paybill ts project",
+  "version": "1.0.0-beta.1",
+  "keywords": [
+    "paybill",
+    "typescript",
+    "tsconfig"
+  ],
+  "files": [
+    "tsconfig.json"
+  ],
+  "author": {
+    "name": "Paybill Ke Limited",
+    "email": "support@paybill.dev"
+  },
+  "license": "BSL-1.0",
+  "bugs": {
+    "url": "https://github.com/paybilldev/paybill/issues"
+  },
+  "homepage": "https://github.com/paybilldev/paybill/packages/tsconfig",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paybilldev/paybill.git",
+    "directory": "packages/tsconfig"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module"
+}
