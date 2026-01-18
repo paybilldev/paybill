@@ -1,0 +1,5 @@
+apis:
+  auth-api:
+    root: http://localhost:5000/docs/json
+    x-openapi-ts:
+      output: ./types/auth.d.ts

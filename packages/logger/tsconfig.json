@@ -2,12 +2,8 @@
 	"extends": "@paybilldev/tsconfig",
 	"compilerOptions": {
 		"strict": false,
-		"rootDir": "./",
+	    "rootDir": "src",
 		"outDir": "./dist",
-		"lib": ["esnext"],
-		"noUncheckedIndexedAccess": false,
-		"types": ["node"]
-	},
-	"exclude": ["dist", "node_modules"],
-	"include": ["src", "test"]
+		"noUncheckedIndexedAccess": false
+	}
 }
