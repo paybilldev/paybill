@@ -91,11 +91,11 @@ const adminSSORoutes: FastifyPluginAsync = async app => {
             $ref: 'UnAuthorizedResponse',
           },
           403: {
-            description: `HTTP Forbidden response.`,
+            description: 'HTTP Forbidden response.',
             $ref: 'ErrorResponse',
           },
           404: {
-            description: `There is no such user.`,
+            description: 'There is no such user.',
             $ref: 'ErrorResponse',
           },
           422: {
@@ -709,7 +709,7 @@ const adminSSORoutes: FastifyPluginAsync = async app => {
             $ref: 'UnAuthorizedResponse',
           },
           404: {
-            description: `OAuth client not found`,
+            description: 'OAuth client not found',
             $ref: 'ErrorResponse',
           },
         },
@@ -777,7 +777,8 @@ const adminSSORoutes: FastifyPluginAsync = async app => {
     {
       schema: {
         summary: 'Delete OAuth client (admin)',
-        description: `Removes an OAuth client registration. Only available when OAuth server is enabled.`,
+        description:
+          'Removes an OAuth client registration. Only available when OAuth server is enabled.',
         tags: ['admin', 'oauth-server'],
         operationId: 'AdminSSOController_deleteOAuthClientById',
         params: {

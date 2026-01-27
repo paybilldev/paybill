@@ -1,0 +1,54 @@
+{
+  "name": "@paybilldev/cache",
+  "version": "1.0.0-beta.1",
+  "description": "Cache package for PaybillDev, providing caching utilities for storing and retrieving data from a cache.",
+  "license": "BSL-1.0",
+  "main": "dist/index.js",
+  "types": "types/index.d.ts",
+  "keywords": [
+    "cache"
+  ],
+  "author": {
+    "name": "Paybill Ke Limited",
+    "email": "support@paybill.dev"
+  },
+  "scripts": {
+    "build": "rimraf dist types && tsc --build tsconfig.build.json",
+    "clean": "rimraf node_modules dist .turbo coverage",
+    "typecheck": "tsc --project tsconfig.build.json",
+    "test": "NODE_ENV=test vitest",
+    "cov": "NODE_ENV=test vitest --coverage",
+    "prepublishOnly": "pnpm build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paybilldev/paybill.git",
+    "directory": "packages/cache"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "async-mutex": "^0.5.0",
+    "bloom-filters": "^3.0.1",
+    "cache-manager": "^5.2.4",
+    "cache-manager-redis-yet": "^4.1.2",
+    "deepmerge": "^4.3.1",
+    "lodash": "^4.17.21",
+    "redis": "^4.6.10"
+  },
+  "devDependencies": {
+    "@paybilldev/tsconfig": "workspace:^",
+    "@types/lodash": "4.17.20",
+    "@types/node": "20.17.10",
+    "@vitest/coverage-istanbul": "^3.2.4",
+    "fs-extra": "11.3.3",
+    "rimraf": "6",
+    "ts-node": "10.9.2",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

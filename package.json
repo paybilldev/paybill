@@ -44,7 +44,7 @@
   },
   "engines": {
     "pnpm": "10.18",
-    "node": ">=22"
+    "node": ">=18"
   },
   "keywords": ["storage", "functions", "database", "auth"],
   "packageManager": "pnpm@10.18.0"

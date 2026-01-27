@@ -1,13 +1,30 @@
+import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import paybillRoutes from './routes/index.js';
 import {registerOpenAPI} from './openapi/plugin.js';
 import rateLimit from '@fastify/rate-limit';
+import {fastifySequelize, fastifyJwt} from './plugins/index.js';
+import {Dialect} from '@paybilldev/sequelize';
+import {errorHandler} from './plugins/error-handler.js';
+import paybillCache from './plugins/cache-manager.js';
 
 export async function buildApp() {
   const server = Fastify({logger: true});
 
   server.register(rateLimit); // global plugin registration
+  server.register(fastifyJwt);
+
+  server.register(fastifySequelize, {
+    dialect: process.env.DB_DRIVER
+      ? (process.env.DB_DRIVER as Dialect)
+      : 'sqlite',
+    host: process.env.DB_HOST ? process.env.DB_HOST : 'localhost',
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+  });
 
   await registerOpenAPI(server, {
     title: 'Paybill Auth REST API',
@@ -80,6 +97,8 @@ Notes:
     ],
   });
 
+  server.setErrorHandler(errorHandler);
+
   await server.register(cors, {
     origin: true,
     credentials: true,
@@ -97,6 +116,8 @@ Notes:
     exposedHeaders: ['X-Total-Count', 'Link', 'X-Paybill-Api-Version'],
   });
   await server.register(paybillRoutes, {prefix: process.env.URL_PREFIX || '/'});
+
+  await server.register(paybillCache);
 
   return server;
 }

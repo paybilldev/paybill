@@ -1,9 +1,0 @@
-{
-	"extends": "@paybilldev/tsconfig",
-	"compilerOptions": {
-		"strict": false,
-	    "rootDir": "src",
-		"outDir": "./dist",
-		"noUncheckedIndexedAccess": false
-	}
-}

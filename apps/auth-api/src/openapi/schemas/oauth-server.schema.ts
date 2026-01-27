@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {zodToJsonSchema} from '../utils/zod-to-json-schema.js';
 
-export const OAuthTokenBodySchema = z
+const OAuthTokenBodySchema = z
   .object({
     grant_type: z
       .enum(['authorization_code', 'refresh_token'])
@@ -34,6 +34,8 @@ export const OAuthTokenBodySchema = z
       .string()
       .optional()
       .describe('OAuth client secret (for confidential clients)'),
+
+    resource: z.string().optional().describe('Resource indicator per RFC 8707'),
   })
   .passthrough();
 

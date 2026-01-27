@@ -172,11 +172,6 @@ export async function registerOpenAPI(
   });
 
   app.addSchema({
-    $id: 'ErrorResponse',
-    ...(ErrorResponseJsonSchema as object),
-  });
-
-  app.addSchema({
     $id: 'VerifyBody',
     ...(VerifyBodyJsonSchema as object),
   });
@@ -331,41 +326,6 @@ export async function registerOpenAPI(
     ...(OAuthTokenResponseJsonSchema as object),
   });
 
-  app.addSchema({
-    $id: 'BadRequestResponse',
-    description: 'HTTP Bad Request response.',
-    $ref: 'ErrorResponse',
-  });
-
-  app.addSchema({
-    $id: 'UnAuthorizedResponse',
-    description: 'HTTP Unauthorized response.',
-    $ref: 'ErrorResponse',
-  });
-
-  app.addSchema({
-    $id: 'ForbiddenResponse',
-    description: 'HTTP Forbidden response.',
-    $ref: 'ErrorResponse',
-  });
-
-  app.addSchema({
-    $id: 'InternalServerErrorResponse',
-    description: 'HTTP Internal Server Error.',
-    $ref: 'ErrorResponse',
-  });
-
-  app.addSchema({
-    $id: 'RateLimitErrorResponse',
-    ...(RateLimitErrorResponseJsonSchema as object),
-  });
-
-  app.addSchema({
-    $id: 'RateLimitResponse',
-    description: 'HTTP Too Many Requests.',
-    $ref: 'RateLimitErrorResponse',
-  });
-
   const AccessRefreshTokenRedirectResponseSchema = {
     type: 'object',
     description:
@@ -494,6 +454,46 @@ export async function registerOpenAPI(
   app.addSchema({
     $id: 'SettingsResponse',
     ...SettingsResponseJsonSchema,
+  });
+
+  app.addSchema({
+    $id: 'ErrorResponse',
+    ...(ErrorResponseJsonSchema as object),
+  });
+
+  app.addSchema({
+    $id: 'BadRequestResponse',
+    description: 'HTTP Bad Request response.',
+    $ref: 'ErrorResponse',
+  });
+
+  app.addSchema({
+    $id: 'UnAuthorizedResponse',
+    description: 'HTTP Unauthorized response.',
+    $ref: 'ErrorResponse',
+  });
+
+  app.addSchema({
+    $id: 'ForbiddenResponse',
+    description: 'HTTP Forbidden response.',
+    $ref: 'ErrorResponse',
+  });
+
+  app.addSchema({
+    $id: 'InternalServerErrorResponse',
+    description: 'HTTP Internal Server Error.',
+    $ref: 'ErrorResponse',
+  });
+
+  app.addSchema({
+    $id: 'RateLimitErrorResponse',
+    ...(RateLimitErrorResponseJsonSchema as object),
+  });
+
+  app.addSchema({
+    $id: 'RateLimitResponse',
+    description: 'HTTP Too Many Requests.',
+    $ref: 'RateLimitErrorResponse',
   });
 
   if (options.additionalSchemas) {

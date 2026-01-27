@@ -21,7 +21,6 @@ export const sendRecoveryEmail = async (options: {
   meta_security?: Record<string, unknown>;
 }) => {
   // Implement email sending logic here
-  return;
 };
 export const signupUser = async (options: {
   email?: string;

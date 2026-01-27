@@ -14,9 +14,7 @@ const paybillRoutes: FastifyPluginAsync = async app => {
   app.register(statusRoutes, {prefix: '/'});
   app.register(authRoutes, {prefix: '/'});
   app.register(oauthClientRoutes, {prefix: '/'});
-  if (process.env.OAUTH_SERVER_ENABLED === 'true') {
-    app.register(oauthRoutes, {prefix: '/oauth'});
-  }
+  app.register(oauthRoutes, {prefix: '/oauth'});
   app.register(userRoutes, {prefix: '/'});
   app.register(adminRoutes, {prefix: '/'});
   app.register(generalRoutes, {prefix: '/'});
