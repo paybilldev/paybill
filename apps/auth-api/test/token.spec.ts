@@ -7,8 +7,8 @@ import {
   createOAuthClient,
   createOAuthAuthorization,
   createUser,
-  hashSecret,
 } from './test-helpers';
+import {hashSecret} from '../src/services';
 
 let app: any;
 const prefix = process.env.URL_PREFIX || '';
@@ -71,41 +71,41 @@ describe(`POST ${prefix}/oauth/token`, () => {
     });
   });
 
-  // // --- Basic validation ---
-  // it('returns 400 if client_id is missing', async () => {
-  //   const res = await supertest(app.server)
-  //     .post(`${prefix}/oauth/token`)
-  //     .send({grant_type: 'authorization_code', code: 'abc'});
-  //   expect(res.status).toBe(400);
-  //   expect(res.body.msg).toMatch(/client_id is required/);
-  // });
+  // --- Basic validation ---
+  it('returns 400 if client_id is missing', async () => {
+    const res = await supertest(app.server)
+      .post(`${prefix}/oauth/token`)
+      .send({grant_type: 'authorization_code', code: 'abc'});
+    expect(res.status).toBe(400);
+    expect(res.body.msg).toMatch(/client_id is required/);
+  });
 
-  // it('returns 400 if client_id is not a valid UUID', async () => {
-  //   const res = await supertest(app.server).post(`${prefix}/oauth/token`).send({
-  //     client_id: 'not-a-uuid',
-  //     grant_type: 'authorization_code',
-  //     code: 'abc',
-  //   });
-  //   expect(res.status).toBe(400);
-  //   expect(res.body.msg).toMatch(/client_id must match format "uuid"/);
-  // });
+  it('returns 400 if client_id is not a valid UUID', async () => {
+    const res = await supertest(app.server).post(`${prefix}/oauth/token`).send({
+      client_id: 'not-a-uuid',
+      grant_type: 'authorization_code',
+      code: 'abc',
+    });
+    expect(res.status).toBe(400);
+    expect(res.body.msg).toMatch(/client_id must match format "uuid"/);
+  });
 
-  // it('returns 400 if grant_type is missing', async () => {
-  //   const res = await supertest(app.server)
-  //     .post(`${prefix}/oauth/token`)
-  //     .send({client_id: client.id, code: 'abc'});
-  //   expect(res.status).toBe(400);
-  //   expect(res.body.msg).toMatch(/must have required property 'grant_type'/);
-  // });
+  it('returns 400 if grant_type is missing', async () => {
+    const res = await supertest(app.server)
+      .post(`${prefix}/oauth/token`)
+      .send({client_id: client.id, code: 'abc'});
+    expect(res.status).toBe(400);
+    expect(res.body.msg).toMatch(/must have required property 'grant_type'/);
+  });
 
-  // it('returns 400 for unsupported grant_type', async () => {
-  //   const res = await supertest(app.server)
-  //     .post(`${prefix}/oauth/token`)
-  //     .send({client_id: client.id, grant_type: 'password'});
-  //   expect(res.status).toBe(400);
-  //   // ✅ Fastify schema validation error
-  //   expect(res.body.msg).toMatch(/must be equal to one of the allowed values/);
-  // });
+  it('returns 400 for unsupported grant_type', async () => {
+    const res = await supertest(app.server)
+      .post(`${prefix}/oauth/token`)
+      .send({client_id: client.id, grant_type: 'password'});
+    expect(res.status).toBe(400);
+    // ✅ Fastify schema validation error
+    expect(res.body.msg).toMatch(/must be equal to one of the allowed values/);
+  });
 
   // --- Client auth methods ---
   it('accepts client credentials via POST body', async () => {

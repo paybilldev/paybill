@@ -11,6 +11,7 @@ import {OAuthAuthorizationModel} from '../model/OAuthAuthorizationModel';
 import {AuditLogEntryModel} from '../model/AuditLogEntryModel';
 import {SessionModel} from '../model/SessionModel';
 import {MfaAmrClaimModel} from '../model/MfaAmrClaimModel';
+import {OAuthConsentModel} from '../model/OAuthConsentModel';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -58,6 +59,7 @@ const fastifySequelize: FastifyPluginAsync<Options> = async (
     AuditLogEntryModel,
     SessionModel,
     MfaAmrClaimModel,
+    OAuthConsentModel,
   });
 
   fastifyInstance.log.debug('load plugin collections');

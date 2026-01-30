@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginAsync } from 'fastify';
+import {FastifyInstance, FastifyPluginAsync} from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import crypto from 'crypto';
 
@@ -59,7 +59,11 @@ export interface JWTConfiguration {
 /* ---------- Helpers ---------- */
 
 function base64url(buf: Buffer): string {
-  return buf.toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  return buf
+    .toString('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
 }
 
 function deriveHS256Key(secret: string): JwtKeysDecoder {
@@ -87,7 +91,7 @@ function parseJwkKeys(raw?: string): JwtKeysDecoder | null {
 
   const arr: Jwk[] = JSON.parse(raw);
   return Object.fromEntries(
-    arr.map((jwk) => {
+    arr.map(jwk => {
       const kid = jwk.kid!;
       const isSymmetric = jwk.kty === 'oct';
 
@@ -114,13 +118,15 @@ function parseJwkKeys(raw?: string): JwtKeysDecoder | null {
               },
         },
       ];
-    })
+    }),
   );
 }
 
 /* ---------- applyDefaultsJWT (Go equivalent) ---------- */
 
-export function applyDefaultsJWT(partial: Partial<JWTConfiguration>): JWTConfiguration {
+export function applyDefaultsJWT(
+  partial: Partial<JWTConfiguration>,
+): JWTConfiguration {
   const secret = partial.secret ?? process.env.JWT_SECRET ?? '';
   const parsedKeys = parseJwkKeys(process.env.JWT_KEYS);
   const keys = parsedKeys ?? deriveHS256Key(secret);
@@ -131,11 +137,14 @@ export function applyDefaultsJWT(partial: Partial<JWTConfiguration>): JWTConfigu
     secret,
     exp: partial.exp ?? Number(process.env.JWT_EXP ?? 3600),
     aud: partial.aud ?? process.env.JWT_AUD ?? 'authenticated',
-    issuer: partial.issuer ?? process.env.JWT_ISSUER ?? process.env.URL_PREFIX  ?? '',
+    issuer:
+      partial.issuer ?? process.env.JWT_ISSUER ?? process.env.URL_PREFIX ?? '',
     adminGroupName:
       partial.adminGroupName ?? process.env.JWT_ADMIN_GROUP_NAME ?? 'admin',
     defaultGroupName:
-      partial.defaultGroupName ?? process.env.JWT_DEFAULT_GROUP_NAME ?? 'authenticated',
+      partial.defaultGroupName ??
+      process.env.JWT_DEFAULT_GROUP_NAME ??
+      'authenticated',
     adminRoles:
       partial.adminRoles ??
       (process.env.JWT_ADMIN_ROLES
@@ -145,7 +154,7 @@ export function applyDefaultsJWT(partial: Partial<JWTConfiguration>): JWTConfigu
     keys,
     validMethods:
       partial.validMethods ??
-      Object.values(keys).map((k) => k.privateKey.alg || 'HS256'),
+      Object.values(keys).map(k => k.privateKey.alg || 'HS256'),
   };
 }
 
@@ -155,13 +164,13 @@ export const jwtConfig: JWTConfiguration = applyDefaultsJWT({});
 
 /* ---------- Fastify Plugin ---------- */
 
-export const fastifyJwt: FastifyPluginAsync<{ config?: JWTConfiguration }> = async (
-  fastify,
-  opts
+const fastifyJwt: FastifyPluginAsync<JWTConfiguration> = async (
+  fastifyInstance: FastifyInstance,
+  options: JWTConfiguration,
 ) => {
-  const config = opts?.config ?? jwtConfig; // <-- use override if provided
-  fastify.decorate('jwtConfig', config);
-  fastify.log.info('JWT configuration loaded.');
+  const config = options ?? jwtConfig;
+  fastifyInstance.decorate('jwtConfig', config);
+  fastifyInstance.log.info('JWT configuration loaded.');
 };
 
 export default fastifyPlugin(fastifyJwt);

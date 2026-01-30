@@ -248,3 +248,97 @@ export const OAuthConsentResponseJsonSchema = zodToJsonSchema(
     name: 'OAuthConsentResponse',
   },
 );
+
+const UserInfoSchema = z
+  .object({
+    // Base OIDC claim (always present)
+    sub: z.string().uuid(),
+
+    // Email scope
+    email: z.string().email().optional(),
+    email_verified: z.boolean().optional(),
+
+    // Profile scope
+    name: z.string().optional(),
+    picture: z.string().url().optional(),
+    preferred_username: z.string().optional(),
+    updated_at: z.number().int().optional(),
+    user_metadata: z.record(z.any()).optional(),
+
+    // Phone scope
+    phone: z.string().optional(),
+    phone_verified: z.boolean().optional(),
+  })
+  .passthrough(); // allow future / custom claims
+
+export type UserInfoResponse = z.infer<typeof UserInfoSchema>;
+
+export const UserInfoResponseJsonSchema = zodToJsonSchema(UserInfoSchema, {
+  name: 'UserInfoResponse',
+});
+
+const supportedScopes = ['openid', 'profile', 'email'];
+
+const OAuthAuthorizeQuerySchema = z
+  .object({
+    response_type: z
+      .literal('code')
+      .default('code')
+      .describe('OAuth 2.1 only supports "code"'),
+
+    client_id: z.string().uuid().describe('OAuth client UUID'),
+
+    redirect_uri: z.string().url().describe('Registered redirect URI'),
+
+    scope: z
+      .string()
+      .optional()
+      .default('openid') // default server scope
+      .refine(
+        val => val.split(' ').every(s => supportedScopes.includes(s)),
+        val => ({
+          message: `Invalid scope(s) requested: ${val}`,
+        }),
+      )
+      .describe('Space-separated list of scopes'),
+
+    state: z.string().optional(),
+
+    resource: z
+      .string()
+      .optional()
+      .refine(val => {
+        if (!val) return true; // skip validation if undefined
+        try {
+          const parsed = new URL(val);
+          return (
+            parsed.protocol && parsed.host && !parsed.hash && !parsed.search
+          );
+        } catch {
+          return false;
+        }
+      }, 'Must be absolute URI without query or fragment'),
+
+    code_challenge: z
+      .string()
+      .min(43)
+      .max(128)
+      .regex(/^[A-Za-z0-9\-_]+$/)
+      .describe('PKCE code challenge'),
+
+    code_challenge_method: z
+      .enum(['S256', 'plain'])
+      .transform(val => val.toUpperCase()), // normalize method
+
+    nonce: z.string().optional(),
+  })
+  .passthrough();
+
+export type OAuthAuthorizeQuery = z.infer<typeof OAuthAuthorizeQuerySchema>;
+
+export const OAuthAuthorizeQueryJsonSchema = zodToJsonSchema(
+  OAuthAuthorizeQuerySchema,
+  {
+    name: 'OAuthAuthorizeQuery',
+  },
+);

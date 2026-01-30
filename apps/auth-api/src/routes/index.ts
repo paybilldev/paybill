@@ -9,15 +9,17 @@ import userRoutes from './user.js';
 import generalRoutes from './general.js';
 import ssoRoutes from './sso.js';
 import samlRoutes from './saml.js';
-
+import wellKnownRoutes from './well-known.js';
 const paybillRoutes: FastifyPluginAsync = async app => {
   app.register(statusRoutes, {prefix: '/'});
   app.register(authRoutes, {prefix: '/'});
   app.register(oauthClientRoutes, {prefix: '/'});
-  app.register(oauthRoutes, {prefix: '/oauth'});
+  if ((process.env.OAUTH_SERVER_ENABLED = 'true'))
+    app.register(oauthRoutes, {prefix: '/oauth'});
   app.register(userRoutes, {prefix: '/'});
   app.register(adminRoutes, {prefix: '/'});
   app.register(generalRoutes, {prefix: '/'});
+  app.register(wellKnownRoutes, {prefix: '/'});
   app.register(ssoRoutes, {prefix: '/'});
   app.register(samlRoutes, {prefix: '/'});
 };

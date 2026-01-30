@@ -1,10 +1,8 @@
-// test-helpers.ts
 import {FastifyInstance} from 'fastify';
-import {randomBytes, createHash, createHmac} from 'crypto';
-import {Buffer} from 'buffer';
 
-export function hashSecret(secret: string): string {
-  return createHash('sha256').update(secret).digest().toString('base64url');
+export async function createSession(app: FastifyInstance, data: any) {
+  const Session = app.sequelize.getCollection('sessions').model;
+  return await Session.create(data);
 }
 
 export async function createOAuthClient(app: FastifyInstance, data: any) {
@@ -25,4 +23,9 @@ export async function createOAuthAuthorization(
 export async function createUser(app: FastifyInstance, data: any) {
   const UserModel = app.sequelize.getCollection('users').model; // or whatever your collection name is
   return await UserModel.create(data);
+}
+
+export async function createOAuthConsent(app: FastifyInstance, data: any) {
+  const OAuthConsentModel = app.sequelize.getCollection('oauth_consents').model; // or whatever your collection name is
+  return await OAuthConsentModel.create(data);
 }

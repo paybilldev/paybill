@@ -186,15 +186,14 @@ export default defineCollection({
       },
     },
     {
-      name: 'raw_app_meta_data',
+      name: 'app_metadata',
       type: 'jsonb',
-      comment: 'Raw metadata stored by the app (custom user properties).',
+      comment: 'Metadata stored by the app (custom user properties).',
     },
     {
-      name: 'raw_user_meta_data',
+      name: 'user_metadata',
       type: 'jsonb',
-      comment:
-        'Raw metadata stored per user (custom user-specific properties).',
+      comment: 'Metadata stored per user (custom user-specific properties).',
     },
     {
       name: 'is_super_admin',

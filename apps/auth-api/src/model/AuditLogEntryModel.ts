@@ -71,8 +71,8 @@ export class AuditLogEntryModel extends Model {
       action,
     };
 
-    if (actor.raw_app_meta_data?.full_name) {
-      payload.actor_name = actor.raw_app_meta_data.full_name;
+    if (actor.app_metadata?.full_name) {
+      payload.actor_name = actor.app_metadata.full_name;
     }
 
     if (traits) {

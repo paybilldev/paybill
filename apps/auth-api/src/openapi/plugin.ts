@@ -57,12 +57,14 @@ import {
 import {
   OAuthAuthorizationResponseJsonSchema,
   OAuthAuthorizationsAuthorizationIdConsentBodyJsonSchema,
+  OAuthAuthorizeQueryJsonSchema,
   OAuthClientListResponseJsonSchema,
   OAuthClientResponseJsonSchema,
   OAuthClientsBodyJsonSchema,
   OAuthConsentResponseJsonSchema,
   OAuthTokenBodyJsonSchema,
   OAuthTokenResponseJsonSchema,
+  UserInfoResponseJsonSchema,
 } from './schemas/oauth-server.schema.js';
 import {SSOBodyJsonSchema} from './schemas/sso.schema.js';
 
@@ -413,6 +415,11 @@ export async function registerOpenAPI(
     ...WebAuthnChallengeResponseJsonSchema,
   });
 
+  app.addSchema({
+    $id: 'OAuthAuthorizeQuery',
+    ...OAuthAuthorizeQueryJsonSchema,
+  });
+
   const OAuthCallbackRedirectResponseSchema = {
     type: 'object',
     description:
@@ -432,6 +439,11 @@ export async function registerOpenAPI(
   app.addSchema({
     $id: 'OAuthCallbackRedirectResponse',
     ...OAuthCallbackRedirectResponseSchema,
+  });
+
+  app.addSchema({
+    $id: 'UserInfoResponse',
+    ...UserInfoResponseJsonSchema,
   });
 
   // --- OAuth authorize redirect schema ---

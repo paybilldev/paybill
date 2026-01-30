@@ -8,12 +8,13 @@ import {fastifySequelize, fastifyJwt} from './plugins/index.js';
 import {Dialect} from '@paybilldev/sequelize';
 import {errorHandler} from './plugins/error-handler.js';
 import paybillCache from './plugins/cache-manager.js';
+import {jwtConfig} from './plugins/jwt.js';
 
 export async function buildApp() {
   const server = Fastify({logger: true});
 
   server.register(rateLimit); // global plugin registration
-  server.register(fastifyJwt);
+  server.register(fastifyJwt, jwtConfig);
 
   server.register(fastifySequelize, {
     dialect: process.env.DB_DRIVER

@@ -1,41 +1,15 @@
-import { FastifyRequest } from 'fastify';
+import {FastifyRequest} from 'fastify';
 import {
-  OAuthClientsBody,
-  OAuthAuthorizationsAuthorizationIdConsentBody,
-  OAuthClientResponse,
-  OAuthAuthorizationResponse,
-  OAuthConsentResponse,
-} from '../openapi/index.js';
-import { CompactEncrypt, compactDecrypt, importJWK } from 'jose';
-import { createHmac, randomBytes } from 'crypto';
-import { SignJWT as JoseSignJWT, JWTPayload } from 'jose';
-import { Algorithm, JwtPayload } from 'jsonwebtoken';
-import { Jwk, JwkInfo, JWTConfiguration } from '../plugins/jwt.js';
-
-/* ---------- Placeholder Implementations ---------- */
-export const getOAuthAuthorization = async (id: string) =>
-  ({} as OAuthAuthorizationResponse);
-
-export const postOAuthConsent = async (
-  id: string,
-  body: OAuthAuthorizationsAuthorizationIdConsentBody,
-) => ({} as OAuthConsentResponse);
-
-export const buildAuthorizationRedirectUrl = async (query: any) =>
-  '/login'; // Replace with actual logic
-
-export const registerOAuthClient = async (body: OAuthClientsBody) =>
-  ({} as OAuthClientResponse);
-
-export const buildOAuthAuthorizationUrl = async (params: {
-  provider: string;
-  scopes: string;
-  invite_token?: string;
-  redirect_to?: string;
-  code_challenge_method?: 'plain' | 's256';
-}): Promise<string> => {
-  return 'https://example.com/authorize';
-};
+  CompactEncrypt,
+  compactDecrypt,
+  decodeProtectedHeader,
+  importJWK,
+  jwtVerify,
+} from 'jose';
+import {createHash, createHmac, randomBytes} from 'crypto';
+import {SignJWT as JoseSignJWT, JWTPayload} from 'jose';
+import {Algorithm, JwtPayload} from 'jsonwebtoken';
+import {Jwk, JwkInfo, JWTConfiguration} from '../plugins/jwt.js';
 
 /* ---------- GrantParams ---------- */
 export interface GrantParams {
@@ -74,7 +48,7 @@ export interface AccessTokenClaims extends JwtPayload {
   user_metadata: Record<string, any>;
   role: string;
   aal?: string;
-  amr?: Array<{ method: string; timestamp: number; provider?: string }>;
+  amr?: Array<{method: string; timestamp: number; provider?: string}>;
   session_id?: string;
   is_anonymous: boolean;
   client_id?: string;
@@ -92,12 +66,21 @@ export function parseScopeString(scopeString: string): string[] {
   if (!scopeString) return [];
   return scopeString
     .split(' ')
-    .map((s) => s.trim())
+    .map(s => s.trim())
     .filter(Boolean);
 }
 
 export function hasScope(scopeList: string[], scope: Scope): boolean {
   return scopeList.includes(scope);
+}
+
+export function hasScopeInRequest(
+  request: FastifyRequest,
+  scope: Scope,
+): boolean {
+  if (!request.jwtClaims?.scope) return false;
+  const scopes = request.jwtClaims.scope.split(' ');
+  return scopes.includes(scope);
 }
 
 export interface IDTokenClaims extends JwtPayload {
@@ -162,7 +145,7 @@ export async function decryptKey(storedKey: string): Promise<Buffer> {
     'A256GCM',
   );
 
-  const { plaintext } = await compactDecrypt(storedKey, jweKey);
+  const {plaintext} = await compactDecrypt(storedKey, jweKey);
   return Buffer.from(plaintext);
 }
 
@@ -200,7 +183,7 @@ function isAsymmetricKey(jwk: Jwk): boolean {
   return jwk.kty !== 'oct';
 }
 
-export function getSigningAlg(jwk: { alg?: string }): Algorithm {
+export function getSigningAlg(jwk: {alg?: string}): Algorithm {
   switch (jwk.alg) {
     case 'RS256':
     case 'RS384':
@@ -225,12 +208,12 @@ export function getSigningAlg(jwk: { alg?: string }): Algorithm {
  */
 async function getJoseKey(jwk: Jwk) {
   if (jwk.kty === 'oct' && jwk.k) {
-    return importJWK({ kty: 'oct', k: jwk.k, alg: jwk.alg }, jwk.alg);
+    return importJWK({kty: 'oct', k: jwk.k, alg: jwk.alg}, jwk.alg);
   }
 
   if (jwk.kty === 'EC' && jwk.d) {
     // Ensure private key has only "sign"
-    const privateJwk = { ...jwk, key_ops: ['sign'] };
+    const privateJwk = {...jwk, key_ops: ['sign']};
     return importJWK(privateJwk, jwk.alg);
   }
 
@@ -287,4 +270,56 @@ export async function generateRefreshToken(
     .slice(0, 4);
 
   return Buffer.concat([payload, signature, checksum]).toString('base64url');
+}
+
+export function hashSecret(secret: string): string {
+  const hash = createHash('sha256').update(secret).digest();
+  return Buffer.from(hash).toString('base64url');
+}
+
+export function generateClientSecret(): string {
+  return randomBytes(32).toString('base64url');
+}
+
+/**
+ * Verifies JWT using same logic as Go implementation:
+ * - Prefers kid-matched public key from config
+ * - Falls back to HS256 with secret when kid missing and alg=HS256
+ * - Validates against configured algorithms only
+ */
+export async function verifyJWT(
+  token: string,
+  config: JWTConfiguration,
+): Promise<JWTPayload> {
+  try {
+    const header = decodeProtectedHeader(token);
+    const {kid, alg} = header;
+
+    let key: any;
+    if (kid && config.keys[kid]) {
+      const jwkInfo = config.keys[kid];
+      // Prefer public key for verification; fallback to private key for symmetric keys
+      const jwk = jwkInfo.publicKey || jwkInfo.privateKey;
+      key = await importJWK(jwk, alg as string);
+    } else if (alg === 'HS256') {
+      // Fallback to symmetric verification (matches Go behavior)
+      key = new TextEncoder().encode(config.secret);
+    } else {
+      throw new Error(`Unrecognized JWT kid '${kid}' for algorithm '${alg}'`);
+    }
+
+    const {payload} = await jwtVerify(token, key, {
+      algorithms: config.validMethods,
+    });
+
+    return payload;
+  } catch (err: any) {
+    throw new Error(`invalid JWT: ${err.message || 'verification failed'}`);
+  }
+}
+
+export const SupportedOAuthScopes = Object.values(Scope);
+
+export function IsSupportedScope(scope: string): boolean {
+  return (SupportedOAuthScopes as string[]).includes(scope);
 }

@@ -104,6 +104,8 @@ export {
   OAuthAuthorizationResponseJsonSchema,
   OAuthAuthorizationsAuthorizationIdConsentBodyJsonSchema,
   OAuthConsentResponseJsonSchema,
+  UserInfoResponseJsonSchema,
+  OAuthAuthorizeQueryJsonSchema,
   type OAuthConsentResponse,
   type OAuthAuthorizationsAuthorizationIdConsentBody,
   type OAuthAuthorizationResponse,
@@ -112,6 +114,8 @@ export {
   type OAuthClientListResponse,
   type OAuthClientResponse,
   type OAuthTokenBody,
+  type UserInfoResponse,
+  type OAuthAuthorizeQuery,
 } from './oauth-server.schema.js';
 
 export {SSOBodyJsonSchema, type SSOBody} from './sso.schema.js';
